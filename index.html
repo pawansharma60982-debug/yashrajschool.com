@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Yash Raj School Portal — Admission & Notification System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root{
+      --bg1:#0b1220; --accent:#06b6d4; --primary:#4f46e5; --card:#ffffff;
+      --muted:#6b7280; --glass:rgba(255,255,255,0.06); --radius:14px;
+      --shadow:0 8px 28px rgba(2,6,23,0.18); --success:#10b981; --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+    html,body{height:100%}
+    body{margin:0;min-height:100vh;background:linear-gradient(135deg,var(--bg1) 0%, #05284a 70%);color:#071126;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(90deg,var(--primary),#7c3aed);color:#fff;box-shadow:0 6px 28px rgba(0,0,0,0.25)}
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(180deg,#fff,#eef2ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:800}
+    header h1{font-size:16px;margin:0}
+    header .actions{display:flex;gap:10px;align-items:center}
+    .btn{background:var(--primary);color:#fff;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;transition:all .22s ease;box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+    .btn.ghost{background: blue;border:1px solid rgba(255,255,255,0.08)}
+    .btn.alt{background:var(--accent);color:#042024}
+    .btn.warn{background:var(--danger)}
+    main{max-width:1140px;margin:28px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:22px; width:100%}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);overflow:hidden}
+    .big-card{min-height:260px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .muted{color:var(--muted)}
+    .profile .avatar{width:100%;height:160px;border-radius:10px;background:linear-gradient(135deg,#e9d5ff,#c7f9ff)}
+    .meta{display:flex;gap:12px;align-items:center}
+    .avatar-small{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px}
+    .stat-row{display:flex;gap:10px;margin-top:8px}
+    .stat{flex:1;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#f8fafc);text-align:center}
+    .list{list-style:none;padding-left:0;margin:0}
+    .list li{padding:12px;border-radius:12px;border:1px solid #eef2f7;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.5);backdrop-filter:blur(4px);z-index:9999}
+    .modal.open{display:flex}
+    .modal-box{overflow: scroll; height: 560px; width: 560px;max-width:94%;background:linear-gradient(180deg,#fff,#f8fafc);border-radius:12px;padding:18px;box-shadow:0 20px 60px rgba(2,6,23,0.6);position:relative}
+    .close-x{position:absolute;right:12px;top:12px;background:#f1f5f9;border-radius:50%;width:34px;height:34px;border:none;cursor:pointer;font-weight:700}
+    label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6e9ef;margin-top:6px;font-size:14px}
+    textarea{min-height:110px}
+    .highlight{background:linear-gradient(90deg,#fff3cd,#ffe699);padding:12px;border-radius:10px;border:1px solid #ffecb5}
+    .pill{background:#eef2ff;padding:6px 10px;border-radius:999px;font-weight:600}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    .small{font-size:13px;color:var(--muted)}
+    footer{padding:12px;text-align:center;color:#9aa3b2}
+    @media(max-width:980px){main{grid-template-columns:1fr} .profile{order:-1}}
+    
+    /* Additional styles for new functionality */
+    .student-profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .profile-section {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .profile-section h4 {
+      margin-top: 0;
+      color: var(--primary);
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .notification-history {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .notification-item {
+      padding: 8px;
+      border-left: 3px solid var(--accent);
+      background: white;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+      justify-content: flex-end;
+    }
+    .principal-only {
+      display: none;
+    }
+    .role-principal .principal-only {
+      display: block;
+    }
+    .user-management-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .user-card {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .user-card h4 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    .user-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+    .tab {
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #f1f5f9;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    .desktop-mode-prompt {
+      background: #fff3cd;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ffecb5;
+      display: none;
+    }
+    .notification-priority {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .form-error {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-success {
+      color: var(--success);
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">YR</div>
+      <div>
+        <h1>Yash Raj English High School & Jr. College</h1>
+        <div style="font-size:12px;color:rgba(255,255,255,0.9)">Student Management Portal</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" id="openLogin">Login / Switch</button>
+      <button class="btn alt" id="openAdmission">Admission Form</button>
+      <button class="btn principal-only" id="registerBtn">Register User</button>
+      <button class="btn principal-only" id="manageUsersBtn">Manage Users</button>
+      <button class="btn ghost" id="logoutIcon" title="Logout" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left column -->
+    <div>
+      <div class="card big-card" id="welcomeCard">
+        <div class="section-title"><h2 id="welcomeTitle">Welcome!</h2><div id="roleTag" class="muted"></div></div>
+        <p id="welcomeMsg" class="muted">Please login to access dashboard features.</p>
+        
+        <div class="desktop-mode-prompt" id="desktopModePrompt">
+          <strong>Mobile User Tip:</strong> For the best experience, enable Desktop Mode in your browser settings if buttons are not visible.
+        </div>
+        
+        <div id="userManagementSection" style="display:none">
+          <div class="tab-container">
+            <div class="tab active" data-tab="students">Students</div>
+            <div class="tab" data-tab="teachers">Teachers</div>
+            <div class="tab" data-tab="principals">Principals</div>
+          </div>
+          
+          <div id="studentsTab" class="tab-content">
+            <div class="user-management-grid" id="studentsGrid"></div>
+          </div>
+          
+          <div id="teachersTab" class="tab-content" style="display:none">
+            <div class="user-management-grid" id="teachersGrid"></div>
+          </div>
+          
+          <div id="principalsTab" class="tab-content" style="display:none">
+            <div class="user-management-grid" id="principalsGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="notificationsCard" style="margin-top:18px;display:none">
+        <div class="section-title"><h2>Notifications <span id="notifCount" class="muted"></span></h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="refreshNotifs">Refresh</button>
+          </div>
+        </div>
+        <div class="notification-priority">
+          <input type="checkbox" id="highPriorityNotifications" checked>
+          <label for="highPriorityNotifications">High priority notifications (recommended for better visibility)</label>
+        </div>
+        <div id="globalHighlighted" style="margin-bottom:12px"></div>
+        <ul class="list" id="notifList"></ul>
+      </div>
+
+      <div class="card" id="studentsCard" style="margin-top:18px;display:none">
+        <div class="section-title"><h2>Classes & Students</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="pill" id="classTeacherLabel" style="display:none"></div>
+            <button class="btn" id="bulkNotifyBtn" style="display:none">Notify Class</button>
+          </div>
+        </div>
+        <div id="classContainer" class="class-card"></div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <aside class="profile card" id="profileCard">
+      <div class="avatar"></div>
+      <div class="meta" style="margin-top:8px">
+        <div class="avatar-small" id="avatarInitial">G</div>
+        <div class="info">
+          <h3 id="profileName">Guest</h3>
+          <p id="profileRole" class="muted">Not logged in</p>
+        </div>
+        <div style="text-align:right">
+          <button class="btn ghost" id="logoutBtn" style="display:none">Logout</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><small>Fees Pending</small><strong id="feesPending">-</strong></div>
+        <div class="stat"><small>Attendance</small><strong id="attendanceVal">-</strong></div>
+      </div>
+
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+        <div class="small">Sample accounts: <strong class="small">aman / pawan / laxmi</strong></div>
+        <button class="btn" id="viewProfileBtn" style="display:none">View Profile</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- LOGIN Modal -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-box small" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('loginModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Login</h3>
+      <p class="muted">Select role and enter credentials.</p>
+
+      <div class="highlight small" style="margin-bottom:12px">
+        <strong>Demo credentials:</strong>
+        <div>Teachers: <em>teachera / teachA</em> , <em>teacherb / teachB</em>, <em>anurag / anuragA</em>, <em>priyanka / priyankaB</em></div>
+        <div>Principal: <em>principal / admin123</em></div>
+        <div>Students: <em>aman / aman123</em>, <em>pawan / pawan123</em></div>
+      </div>
+
+      <label>Role</label>
+      <select id="roleSelect">
+        <option value="">Select Role</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="principal">Principal</option>
+      </select>
+
+      <label>Class / Standard (teachers & students)</label>
+      <select id="standardSelect">
+        <option value="">Select Standard</option>
+        <option value="6">6th</option>
+        <option value="7">7th</option>
+        <option value="8">8th</option>
+        <option value="9">9th</option>
+        <option value="10">10th</option>
+        <option value="11">11th</option>
+        <option value="12">12th</option>
+      </select>
+
+      <label>Username</label>
+      <input id="usernameInput" placeholder="username (case-insensitive)" />
+
+      <label>Password</label>
+      <input id="passwordInput" type="password" placeholder="password" />
+
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" id="doLogin">Login</button>
+        <button class="btn ghost" onclick="closeModal('loginModal')">Cancel</button>
+      </div>
+      <p id="loginError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <!-- ADMISSION FORM MODAL -->
+  <div class="modal" id="admissionModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('admissionModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Student Admission Form</h3>
+      <p class="muted">Fill out the form to apply for admission. All fields are required.</p>
+
+      <form id="admissionForm">
+        <div class="form-row">
+          <div>
+            <label>Student's First Name</label>
+            <input type="text" name="first_name" required />
+            <div class="form-error" id="firstNameError"></div>
+          </div>
+          <div>
+            <label>Student's Last Name</label>
+            <input type="text" name="last_name" required />
+            <div class="form-error" id="lastNameError"></div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label>Date of Birth</label>
+            <input type="date" name="dob" required />
+            <div class="form-error" id="dobError"></div>
+          </div>
+          <div>
+            <label>Gender</label>
+            <select name="gender" required>
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="form-error" id="genderError"></div>
+          </div>
+        </div>
+
+        <label>Parent/Guardian Name</label>
+        <input type="text" name="parent_name" required />
+        <div class="form-error" id="parentNameError"></div>
+
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="parent@example.com" required />
+        <div class="form-error" id="emailError"></div>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" placeholder="+91 1234567890" required />
+        <div class="form-error" id="phoneError"></div>
+
+        <label>Address</label>
+        <textarea name="address" rows="3" required></textarea>
+        <div class="form-error" id="addressError"></div>
+
+        <div class="form-row">
+          <div>
+            <label>Class Applying For</label>
+            <select name="applying_class" required>
+              <option value="">Select Class</option>
+              <option value="6">6th Standard</option>
+              <option value="7">7th Standard</option>
+              <option value="8">8th Standard</option>
+              <option value="9">9th Standard</option>
+              <option value="10">10th Standard</option>
+              <option value="11">11th Standard</option>
+              <option value="12">12th Standard</option>
+            </select>
+            <div class="form-error" id="classError"></div>
+          </div>
+          <div>
+            <label>Previous School</label>
+            <input type="text" name="previous_school" required />
+            <div class="form-error" id="schoolError"></div>
+          </div>
+        </div>
+
+        <label>Additional Notes</label>
+        <textarea name="notes" rows="2"></textarea>
+
+        <div class="form-success" id="admissionSuccess">Admission form submitted successfully! We'll contact you soon.</div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn" id="submitAdmission">Submit Application</button>
+          <button type="button" class="btn ghost" onclick="closeModal('admissionModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- USER REGISTRATION MODAL -->
+  <div class="modal" id="registerModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('registerModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Register New User</h3>
+      <p class="muted">Add a new student, teacher, or principal to the system.</p>
+
+      <label>Role</label>
+      <select id="registerRole">
+        <option value="">Select Role</option>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="principal">Principal</option>
+      </select>
+
+      <div id="registerClassField" style="display:none">
+        <label>Class / Standard</label>
+        <select id="registerClass">
+          <option value="">Select Standard</option>
+          <option value="6A">6A</option>
+          <option value="6B">6B</option>
+          <option value="7A">7A</option>
+          <option value="7B">7B</option>
+          <option value="8A">8A</option>
+          <option value="8B">8B</option>
+          <option value="9A">9A</option>
+          <option value="9B">9B</option>
+          <option value="10A">10A</option>
+          <option value="10B">10B</option>
+          <option value="11A">11A</option>
+          <option value="11B">11B</option>
+          <option value="12A">12A</option>
+          <option value="12B">12B</option>
+        </select>
+      </div>
+
+      <label>Full Name</label>
+      <input id="registerName" placeholder="Full name" />
+
+      <label>Username</label>
+      <input id="registerUsername" placeholder="username (case-insensitive)" />
+
+      <label>Password</label>
+      <input id="registerPassword" type="password" placeholder="password" />
+
+      <label>Roll Number (for students)</label>
+      <input id="registerRoll" placeholder="Roll number" />
+
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" id="doRegister">Register</button>
+        <button class="btn ghost" onclick="closeModal('registerModal')">Cancel</button>
+      </div>
+      <p id="registerError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <!-- STUDENT PROFILE MODAL -->
+  <div class="modal" id="profileModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('profileModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Student Profile</h3>
+      <div id="profileModalContent"></div>
+    </div>
+  </div>
+
+  <!-- UPDATE STUDENT MODAL -->
+  <div class="modal" id="updateModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('updateModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Update Student Information</h3>
+      <p class="muted" id="updateStudentName">Update student details</p>
+      
+      <div class="form-row">
+        <div>
+          <label>Fees Paid (₹)</label>
+          <input type="number" id="updateFeesPaid" min="0" />
+        </div>
+        <div>
+          <label>Attendance (%)</label>
+          <input type="number" id="updateAttendance" min="0" max="100" />
+        </div>
+      </div>
+      
+      <label>Marks (e.g., 420/500)</label>
+      <input id="updateMarks" placeholder="Marks" />
+      
+      <label>Add Notification</label>
+      <textarea id="updateNotification" placeholder="Enter notification message"></textarea>
+      
+      <div class="form-actions">
+        <button class="btn" id="doUpdate">Update Student</button>
+        <button class="btn ghost" onclick="closeModal('updateModal')">Cancel</button>
+      </div>
+      <p id="updateError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <!-- NOTIFY STUDENT MODAL -->
+  <div class="modal" id="notifyModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('notifyModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Send Notification</h3>
+      <p class="muted" id="notifyStudentName">Send a notification to student</p>
+      
+      <label>Notification Message</label>
+      <textarea id="notifyMessage" placeholder="Enter your message" rows="4"></textarea>
+      
+      <div class="form-actions">
+        <button class="btn" id="doNotify">Send Notification</button>
+        <button class="btn ghost" onclick="closeModal('notifyModal')">Cancel</button>
+      </div>
+      <p id="notifyError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <!-- NOTIFY CLASS MODAL -->
+  <div class="modal" id="notifyClassModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('notifyClassModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Notify Entire Class</h3>
+      <p class="muted">Send a notification to all students in <span id="notifyClassName"></span></p>
+      
+      <label>Notification Message</label>
+      <textarea id="notifyClassMessage" placeholder="Enter your message" rows="4"></textarea>
+      
+      <div class="form-actions">
+        <button class="btn" id="doNotifyClass">Send to Entire Class</button>
+        <button class="btn ghost" onclick="closeModal('notifyClassModal')">Cancel</button>
+      </div>
+      <p id="notifyClassError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <!-- DELETE USER MODAL -->
+  <div class="modal" id="deleteUserModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="close-x" onclick="closeModal('deleteUserModal')">&times;</button>
+      <h3 style="margin-top:0;color:var(--primary)">Delete User</h3>
+      <p class="muted" id="deleteUserName">Are you sure you want to delete this user?</p>
+      <p class="muted">This action cannot be undone.</p>
+      
+      <div class="form-actions">
+        <button class="btn warn" id="doDeleteUser">Delete User</button>
+        <button class="btn ghost" onclick="closeModal('deleteUserModal')">Cancel</button>
+      </div>
+      <p id="deleteError" class="muted" style="color:var(--danger);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <footer>
+    Made with care — Yash Raj School Portal • For any help, open the Admission form and fill details.
+  </footer>
+
+<script>
+// Utility functions
+const el = id => document.getElementById(id);
+function openModal(id){ 
+  const modal = el(id);
+  if (modal) {
+    modal.classList.add('open'); 
+    modal.style.display='flex'; 
+  }
+}
+function closeModal(id){ 
+  const modal = el(id);
+  if (modal) {
+    modal.classList.remove('open'); 
+    modal.style.display='none'; 
+  }
+}
+function escapeHtml(s){ if(!s && s!==0) return ''; return s.toString().replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;',"'":'&#39;'}[m])); }
+
+// Initialize EmailJS with your Public Key
+// Replace with your actual EmailJS Public Key
+emailjs.init("YOUR_PUBLIC_KEY_HERE");
+
+// Check if user is on mobile device
+function isMobileDevice() {
+  return /Mobi|Android/i.test(navigator.userAgent);
+}
+
+// Show desktop mode prompt for mobile users
+function checkMobileUser() {
+  if (isMobileDevice()) {
+    el('desktopModePrompt').style.display = 'block';
+  }
+}
+
+// Initialize data
+function seedData() {
+  if(localStorage.getItem('appInitAt')) {
+    return;
+  }
+  
+  // Initialize with default users
+  addDefaultUsers();
+  localStorage.setItem('appInitAt', new Date().toISOString());
+}
+
+// Add default users to the system
+function addDefaultUsers() {
+  // Students
+  const students = {
+    /*aman: {password:'aman123', name:'Aman Kumar', class:'10A', roll:'101', feesTotal:15000, feesPaid:10000, attendance:'88%', marks:'420/500', notifications:['Welcome back!']},
+    pawan: {password:'pawan123', name:'Pawan Sharma', class:'10A', roll:'102', feesTotal:15000, feesPaid:3000, attendance:'72%', marks:'350/500', notifications:['Exam on 15th Sep']},
+    laxmi: {password:'laxmi123', name:'Laxmi Devi', class:'10A', roll:'103', feesTotal:15000, feesPaid:15000, attendance:'95%', marks:'480/500', notifications:['Holiday on 10th Sep']}
+  */};
+  
+  // Teachers and principals
+  const users = {
+    teachera: {password:'teachA', role:'teacher', name:'Mr. Anurag Sir', class:'10A'},
+    teacherb: {password:'teachB', role:'teacher', name:'Mrs. Priyanka Gupta', class:'10B'},
+    anurag: {password:'anuragA', role:'teacher', name:'Mr. Anurag Gupta', class:'9A'},
+    priyanka: {password:'priyankaB', role:'teacher', name:'Mrs. Priyanka Gupta', class:'9B'},
+    principal: {password:'admin123', role:'principal', name:'Dr. Singh'}
+  };
+  
+  localStorage.setItem('students', JSON.stringify(students));
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('globalNotifs', JSON.stringify([
+    {text: 'School will remain closed on Monday for maintenance'},
+    {text: 'Annual function rehearsals start next week'}
+  ]));
+  
+  alert('Default users added successfully! You can now login with principal/admin123 to access admin features.');
+}
+
+// App state
+let currentUser = null;
+let currentStudentForUpdate = null;
+let currentStudentForNotify = null;
+let currentUserForDelete = null;
+let currentUserTypeForDelete = null;
+
+// Event listeners
+function setupEventListeners() {
+  // Login button
+  el('openLogin').addEventListener('click', () => {
+    el('roleSelect').value=''; 
+    el('standardSelect').value=''; 
+    el('usernameInput').value=''; 
+    el('passwordInput').value=''; 
+    el('loginError').innerText='';
+    openModal('loginModal');
+  });
+  
+  // Admission form button
+  el('openAdmission').addEventListener('click', () => {
+    el('admissionForm').reset();
+    document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
+    el('admissionSuccess').style.display = 'none';
+    openModal('admissionModal');
+  });
+  
+  // Admission form submission
+  el('admissionForm').addEventListener('submit', submitAdmissionForm);
+  
+  // Register button
+  el('registerBtn').addEventListener('click', () => {
+    // Only allow principals to register users
+    if (!currentUser || currentUser.role !== 'principal') {
+      alert('Only principals can register new users.');
+      return;
+    }
+    
+    el('registerRole').value = '';
+    el('registerClass').value = '';
+    el('registerName').value = '';
+    el('registerUsername').value = '';
+    el('registerPassword').value = '';
+    el('registerRoll').value = '';
+    el('registerError').innerText = '';
+    openModal('registerModal');
+  });
+  
+  // Manage users button
+  el('manageUsersBtn').addEventListener('click', () => {
+    if (!currentUser || currentUser.role !== 'principal') {
+      alert('Only principals can manage users.');
+      return;
+    }
+    
+    renderUserManagement();
+    el('userManagementSection').style.display = 'block';
+  });
+  
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      // Add active class to clicked tab
+      tab.classList.add('active');
+      
+      // Hide all tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+      
+      // Show the selected tab content
+      const tabName = tab.getAttribute('data-tab');
+      document.getElementById(`${tabName}Tab`).style.display = 'block';
+      
+      // Render the specific user type
+      if (tabName === 'students') renderStudentsGrid();
+      else if (tabName === 'teachers') renderTeachersGrid();
+      else if (tabName === 'principals') renderPrincipalsGrid();
+    });
+  });
+  
+  // Role selection change
+  el('registerRole').addEventListener('change', function() {
+    el('registerClassField').style.display = 
+      (this.value === 'student' || this.value === 'teacher') ? 'block' : 'none';
+  });
+  
+  // Register user
+  el('doRegister').addEventListener('click', registerUser);
+  
+  // Login user
+  el('doLogin').addEventListener('click', loginUser);
+  
+  // Logout buttons
+  el('logoutBtn').addEventListener('click', logout);
+  el('logoutIcon').addEventListener('click', logout);
+  
+  // View profile button
+  el('viewProfileBtn').addEventListener('click', viewStudentProfile);
+  
+  // Bulk notify button
+  el('bulkNotifyBtn').addEventListener('click', notifyClass);
+  
+  // Update student button
+  el('doUpdate').addEventListener('click', updateStudentData);
+  
+  // Notify student button
+  el('doNotify').addEventListener('click', sendNotificationToStudent);
+  
+  // Notify class button
+  el('doNotifyClass').addEventListener('click', sendNotificationToClass);
+  
+  // Delete user button
+  el('doDeleteUser').addEventListener('click', deleteUser);
+  
+  // Refresh notifications
+  el('refreshNotifs').addEventListener('click', () => renderDashboard());
+  
+  // High priority notifications toggle
+  el('highPriorityNotifications').addEventListener('change', function() {
+    if (this.checked) {
+      alert('High priority notifications enabled. Notifications will be more visible.');
+    }
+  });
+}
+
+// Validate email format
+function isValidEmail(email) {
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email);
+}
+
+// Validate phone number format
+function isValidPhoneNumber(phone) {
+  const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+  return phoneRegex.test(phone);
+}
+
+// Show form error
+function showError(fieldId, message) {
+  const errorEl = el(fieldId + 'Error');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+  }
+}
+
+// Hide form error
+function hideError(fieldId) {
+  const errorEl = el(fieldId + 'Error');
+  if (errorEl) {
+    errorEl.style.display = 'none';
+  }
+}
+
+// Submit admission form
+function submitAdmissionForm(e) {
+  e.preventDefault();
+  
+  // Reset all errors
+  document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
+  el('admissionSuccess').style.display = 'none';
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+  
+  let isValid = true;
+  
+  // Validate first name
+  if (!data.first_name.trim()) {
+    showError('firstName', 'First name is required');
+    isValid = false;
+  }
+  
+  // Validate last name
+  if (!data.last_name.trim()) {
+    showError('lastName', 'Last name is required');
+    isValid = false;
+  }
+  
+  // Validate date of birth
+  if (!data.dob) {
+    showError('dob', 'Date of birth is required');
+    isValid = false;
+  } else {
+    const dob = new Date(data.dob);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    
+    if (age < 5 || age > 18) {
+      showError('dob', 'Student must be between 5 and 18 years old');
+      isValid = false;
+    }
+  }
+  
+  // Validate gender
+  if (!data.gender) {
+    showError('gender', 'Please select a gender');
+    isValid = false;
+  }
+  
+  // Validate parent name
+  if (!data.parent_name.trim()) {
+    showError('parentName', 'Parent/guardian name is required');
+    isValid = false;
+  }
+  
+  // Validate email
+  if (!data.email.trim()) {
+    showError('email', 'Email address is required');
+    isValid = false;
+  } else if (!isValidEmail(data.email)) {
+    showError('email', 'Please enter a valid email address');
+    isValid = false;
+  }
+  
+  // Validate phone
+  if (!data.phone.trim()) {
+    showError('phone', 'Phone number is required');
+    isValid = false;
+  } else if (!isValidPhoneNumber(data.phone)) {
+    showError('phone', 'Please enter a valid phone number');
+    isValid = false;
+  }
+  
+  // Validate address
+  if (!data.address.trim()) {
+    showError('address', 'Address is required');
+    isValid = false;
+  }
+  
+  // Validate class
+  if (!data.applying_class) {
+    showError('class', 'Please select a class');
+    isValid = false;
+  }
+  
+  // Validate previous school
+  if (!data.previous_school.trim()) {
+    showError('school', 'Previous school name is required');
+    isValid = false;
+  }
+  
+  if (!isValid) {
+    return;
+  }
+  
+  // Show loading state
+  const submitBtn = el('submitAdmission');
+  const originalText = submitBtn.textContent;
+  submitBtn.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+  submitBtn.disabled = true;
+  
+  // Send email using EmailJS
+  emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", data)
+    .then(() => {
+      // Show success message
+      el('admissionSuccess').style.display = 'block';
+      form.reset();
+      
+      // Also store in local storage for records
+      const admissions = JSON.parse(localStorage.getItem('admissions') || '[]');
+      admissions.push({
+        ...data,
+        submittedAt: new Date().toISOString(),
+        status: 'pending'
+      });
+      localStorage.setItem('admissions', JSON.stringify(admissions));
+      
+      // Show browser notification if permitted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Admission Submitted', {
+          body: 'Thank you for submitting the admission form. We will contact you soon.'
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Failed to send email:', error);
+      alert('There was an error submitting your form. Please try again or contact the school directly.');
+    })
+    .finally(() => {
+      // Restore button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+}
+
+// User registration
+function registerUser() {
+  // Double-check that only principals can register users
+  if (!currentUser || currentUser.role !== 'principal') {
+    alert('Only principals can register new users.');
+    return;
+  }
+  
+  const role = el('registerRole').value;
+  const username = (el('registerUsername').value || '').toLowerCase().trim();
+  const password = el('registerPassword').value;
+  const name = el('registerName').value;
+  const userClass = el('registerClass').value;
+  const roll = el('registerRoll').value;
+  
+  if (!role) {
+    el('registerError').innerText = 'Please select a role.';
+    return;
+  }
+  
+  if ((role === 'student' || role === 'teacher') && !userClass) {
+    el('registerError').innerText = 'Please select a class.';
+    return;
+  }
+  
+  if (!username || !password || !name) {
+    el('registerError').innerText = 'Please fill all required fields.';
+    return;
+  }
+  
+  if (role === 'student' && !roll) {
+    el('registerError').innerText = 'Please enter a roll number for students.';
+    return;
+  }
+  
+  // Get existing data
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  
+  // Check if username already exists
+  if (students[username] || users[username]) {
+    el('registerError').innerText = 'Username already exists.';
+    return;
+  }
+  
+  // Add the new user
+  if (role === 'student') {
+    students[username] = {
+      password: password,
+      name: name,
+      class: userClass,
+      roll: roll,
+      feesTotal: 15000,
+      feesPaid: 0,
+      attendance: '0%',
+      marks: '0/500',
+      notifications: ['Welcome to the school!']
+    };
+    localStorage.setItem('students', JSON.stringify(students));
+  } else {
+    users[username] = {
+      password: password,
+      role: role,
+      name: name,
+      class: role === 'teacher' ? userClass : undefined
+    };
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+  
+  alert(`User ${username} registered successfully!`);
+  closeModal('registerModal');
+  renderDashboard();
+}
+
+// User login
+function loginUser() {
+  el('loginError').innerText = '';
+  const role = el('roleSelect').value;
+  const std = el('standardSelect').value;
+  const usernameRaw = (el('usernameInput').value || '').toString().trim();
+  const username = usernameRaw.toLowerCase();
+  const password = el('passwordInput').value || '';
+
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+  if(!role){ el('loginError').innerText='Please select a role.'; return; }
+  if((role==='student' || role==='teacher') && !std){ el('loginError').innerText='Please select a standard.'; return; }
+  if(!username || !password){ el('loginError').innerText='Enter username and password.'; return; }
+
+  // STUDENT
+  if(role==='student'){
+    if(!students[username]){ el('loginError').innerText='Student not found.'; return; }
+    if(students[username].password!==password){ el('loginError').innerText='Incorrect password.'; return; }
+    // class check: student.class might be like '10A' -> compare startsWith
+    if(students[username].class && !students[username].class.toString().toLowerCase().startsWith(std.toString().toLowerCase())) {
+      el('loginError').innerText='Selected standard does not match student record.'; return;
+    }
+    currentUser = { username, role:'student', name: students[username].name, class: students[username].class };
+
+  // TEACHER or PRINCIPAL
+  } else if(role==='teacher' || role==='principal'){
+    if(!users[username]){ 
+      el('loginError').innerText='User not found.'; 
+      return; 
+    }
+    if(users[username].password!==password){ 
+      el('loginError').innerText='Incorrect password.'; 
+      return; 
+    }
+    if(users[username].role!==role){ 
+      el('loginError').innerText=`User is not a ${role}.`; 
+      return; 
+    }
+    if(role==='teacher' && users[username].class && !users[username].class.toString().toLowerCase().startsWith(std.toString().toLowerCase())) {
+      el('loginError').innerText='Selected standard does not match teacher record.'; 
+      return;
+    }
+    currentUser = { 
+      username, 
+      role: users[username].role, 
+      name: users[username].name, 
+      class: users[username].class 
+    };
+  }
+
+  closeModal('loginModal');
+  renderDashboard();
+}
+
+// Logout
+function logout() {
+  if(!currentUser) return;
+  if(confirm('Are you sure you want to logout?')) { 
+    currentUser = null; 
+    renderDashboard(); 
+  }
+}
+
+// View student profile (for students viewing their own profile)
+function viewStudentProfile() {
+  if(!currentUser || currentUser.role !== 'student') return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[currentUser.username];
+  
+  if(!student) {
+    alert('Student data not found!');
+    return;
+  }
+  
+  const profileHtml = `
+    <div class="student-profile-grid">
+      <div class="profile-section">
+        <h4>Basic Information</h4>
+        <p><strong>Name:</strong> ${escapeHtml(student.name)}</p>
+        <p><strong>Class:</strong> ${escapeHtml(student.class)}</p>
+        <p><strong>Roll No:</strong> ${escapeHtml(student.roll)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Academic Performance</h4>
+        <p><strong>Marks:</strong> ${escapeHtml(student.marks)}</p>
+        <p><strong>Attendance:</strong> ${escapeHtml(student.attendance)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Financial Information</h4>
+        <p><strong>Total Fees:</strong> ₹${escapeHtml(student.feesTotal)}</p>
+        <p><strong>Fees Paid:</strong> ₹${escapeHtml(student.feesPaid)}</p>
+        <p><strong>Pending Fees:</strong> ₹${escapeHtml(student.feesTotal - student.feesPaid)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Notification History</h4>
+        <div class="notification-history">
+          ${student.notifications && student.notifications.length > 0 
+            ? student.notifications.map(n => `<div class="notification-item">${escapeHtml(n)}</div>`).join('')
+            : '<p>No notifications</p>'
+          }
+        </div>
+      </div>
+    </div>
+  `;
+  
+  el('profileModalContent').innerHTML = profileHtml;
+  openModal('profileModal');
+}
+
+// Open update modal for student (for teachers and principals)
+function openUpdateModal(username) {
+  if (!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal')) return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[username];
+  
+  if(!student) {
+    alert('Student not found!');
+    return;
+  }
+  
+  // Check if student belongs to teacher's class (only for teachers)
+  if (currentUser.role === 'teacher' && student.class !== currentUser.class) {
+    alert('You can only update students from your own class!');
+    return;
+  }
+  
+  currentStudentForUpdate = username;
+  el('updateStudentName').textContent = `Updating details for ${student.name}`;
+  el('updateFeesPaid').value = student.feesPaid;
+  el('updateAttendance').value = parseInt(student.attendance);
+  el('updateMarks').value = student.marks;
+  el('updateNotification').value = '';
+  el('updateError').textContent = '';
+  
+  openModal('updateModal');
+}
+
+// Update student data (for teachers and principals)
+function updateStudentData() {
+  if (!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal') || !currentStudentForUpdate) return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[currentStudentForUpdate];
+  
+  if(!student) {
+    el('updateError').textContent = 'Student not found!';
+    return;
+  }
+  
+  // Check if student belongs to teacher's class (only for teachers)
+  if (currentUser.role === 'teacher' && student.class !== currentUser.class) {
+    el('updateError').textContent = 'You can only update students from your own class!';
+    return;
+  }
+  
+  // Get updated values
+  const feesPaid = parseInt(el('updateFeesPaid').value) || 0;
+  const attendance = parseInt(el('updateAttendance').value) || 0;
+  const marks = el('updateMarks').value.trim();
+  const notification = el('updateNotification').value.trim();
+  
+  // Validate inputs
+  if(feesPaid > student.feesTotal) {
+    el('updateError').textContent = 'Fees paid cannot exceed total fees!';
+    return;
+  }
+  
+  if(attendance < 0 || attendance > 100) {
+    el('updateError').textContent = 'Attendance must be between 0 and 100!';
+    return;
+  }
+  
+  // Update student data
+  student.feesPaid = feesPaid;
+  student.attendance = attendance + '%';
+  student.marks = marks;
+  
+  // Add notification if provided
+  if(notification) {
+    if(!student.notifications) student.notifications = [];
+    student.notifications.push(notification);
+  }
+  
+  // Save updated data
+  students[currentStudentForUpdate] = student;
+  localStorage.setItem('students', JSON.stringify(students));
+  
+  alert('Student information updated successfully!');
+  closeModal('updateModal');
+  renderDashboard();
+}
+
+// Send notification to student (for teachers and principals)
+function sendNotificationToStudent(username) {
+  if (!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal')) return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[username];
+  
+  if(!student) {
+    alert('Student not found!');
+    return;
+  }
+  
+  // Check if student belongs to teacher's class (only for teachers)
+  if (currentUser.role === 'teacher' && student.class !== currentUser.class) {
+    alert('You can only notify students from your own class!');
+    return;
+  }
+  
+  currentStudentForNotify = username;
+  el('notifyStudentName').textContent = `Sending notification to ${student.name}`;
+  el('notifyMessage').value = '';
+  el('notifyError').textContent = '';
+  
+  openModal('notifyModal');
+}
+
+// Send notification to student (for teachers and principals)
+function sendNotificationToStudent() {
+  if (!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal') || !currentStudentForNotify) return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[currentStudentForNotify];
+  
+  if(!student) {
+    el('notifyError').textContent = 'Student not found!';
+    return;
+  }
+  
+  // Check if student belongs to teacher's class (only for teachers)
+  if (currentUser.role === 'teacher' && student.class !== currentUser.class) {
+    el('notifyError').textContent = 'You can only notify students from your own class!';
+    return;
+  }
+  
+  const message = el('notifyMessage').value.trim();
+  
+  if(!message) {
+    el('notifyError').textContent = 'Please enter a notification message!';
+    return;
+  }
+  
+  // Add notification to student
+  if(!student.notifications) student.notifications = [];
+  student.notifications.push(message);
+  
+  // Save updated data
+  students[currentStudentForNotify] = student;
+  localStorage.setItem('students', JSON.stringify(students));
+  
+  alert('Notification sent successfully!');
+  closeModal('notifyModal');
+  renderDashboard();
+}
+
+// Notify entire class (for teachers and principals)
+function notifyClass() {
+  if(!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal')) return;
+  
+  // For principals, they need to select a class
+  if (currentUser.role === 'principal') {
+    // In a real implementation, you would show a class selection dialog
+    alert('Principals need to select a class first. This feature will be implemented in the next version.');
+    return;
+  }
+  
+  el('notifyClassName').textContent = currentUser.class;
+  el('notifyClassMessage').value = '';
+  el('notifyClassError').textContent = '';
+  
+  openModal('notifyClassModal');
+}
+
+// Send notification to entire class (for teachers and principals)
+function sendNotificationToClass() {
+  if(!currentUser || (currentUser.role !== 'teacher' && currentUser.role !== 'principal')) return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const message = el('notifyClassMessage').value.trim();
+  
+  if(!message) {
+    el('notifyClassError').textContent = 'Please enter a notification message!';
+    return;
+  }
+  
+  // For principals, they need to select a class
+  let targetClass = currentUser.class;
+  if (currentUser.role === 'principal') {
+    // In a real implementation, you would get the selected class
+    alert('Principals need to select a class first. This feature will be implemented in the next version.');
+    return;
+  }
+  
+  // Count of notified students
+  let notifiedCount = 0;
+  
+  // Add notification to all students in the class
+  Object.keys(students).forEach(username => {
+    const student = students[username];
+    if(student.class === targetClass) {
+      if(!student.notifications) student.notifications = [];
+      student.notifications.push(`[Class Notification] ${message}`);
+      students[username] = student;
+      notifiedCount++;
+    }
+  });
+  
+  // Save updated data
+  localStorage.setItem('students', JSON.stringify(students));
+  
+  alert(`Notification sent to ${notifiedCount} students in ${targetClass}!`);
+  closeModal('notifyClassModal');
+  renderDashboard();
+}
+
+// Open student profile (for principals)
+function openProfileModal(username) {
+  if(!currentUser || currentUser.role !== 'principal') return;
+  
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const student = students[username];
+  
+  if(!student) {
+    alert('Student not found!');
+    return;
+  }
+  
+  const profileHtml = `
+    <div class="student-profile-grid">
+      <div class="profile-section">
+        <h4>Basic Information</h4>
+        <p><strong>Name:</strong> ${escapeHtml(student.name)}</p>
+        <p><strong>Class:</strong> ${escapeHtml(student.class)}</p>
+        <p><strong>Roll No:</strong> ${escapeHtml(student.roll)}</p>
+        <p><strong>Username:</strong> ${escapeHtml(username)}</p>
+        <p><strong>Password:</strong> ${escapeHtml(student.password)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Academic Performance</h4>
+        <p><strong>Marks:</strong> ${escapeHtml(student.marks)}</p>
+        <p><strong>Attendance:</strong> ${escapeHtml(student.attendance)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Financial Information</h4>
+        <p><strong>Total Fees:</strong> ₹${escapeHtml(student.feesTotal)}</p>
+        <p><strong>Fees Paid:</strong> ₹${escapeHtml(student.feesPaid)}</p>
+        <p><strong>Pending Fees:</strong> ₹${escapeHtml(student.feesTotal - student.feesPaid)}</p>
+      </div>
+      
+      <div class="profile-section">
+        <h4>Notification History</h4>
+        <div class="notification-history">
+          ${student.notifications && student.notifications.length > 0 
+            ? student.notifications.map(n => `<div class="notification-item">${escapeHtml(n)}</div>`).join('')
+            : '<p>No notifications</p>'
+          }
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn" onclick="openUpdateModal('${username}')">Edit Student Data</button>
+      <button class="btn alt" onclick="sendNotificationToStudent('${username}')">Send Notification</button>
+    </div>
+  `;
+  
+  el('profileModalContent').innerHTML = profileHtml;
+  openModal('profileModal');
+}
+
+// Open delete user modal
+function openDeleteUserModal(username, userType) {
+  if(!currentUser || currentUser.role !== 'principal') return;
+  
+  currentUserForDelete = username;
+  currentUserTypeForDelete = userType;
+  
+  let userName = '';
+  if (userType === 'student') {
+    const students = JSON.parse(localStorage.getItem('students') || '{}');
+    userName = students[username]?.name || username;
+  } else {
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    userName = users[username]?.name || username;
+  }
+  
+  el('deleteUserName').textContent = `Are you sure you want to delete ${userName} (${username})?`;
+  el('deleteError').textContent = '';
+  
+  openModal('deleteUserModal');
+}
+
+// Delete user
+function deleteUser() {
+  if(!currentUser || currentUser.role !== 'principal' || !currentUserForDelete || !currentUserTypeForDelete) return;
+  
+  if (currentUserForDelete === currentUser.username) {
+    el('deleteError').textContent = 'You cannot delete your own account!';
+    return;
+  }
+  
+  if (currentUserTypeForDelete === 'student') {
+    const students = JSON.parse(localStorage.getItem('students') || '{}');
+    delete students[currentUserForDelete];
+    localStorage.setItem('students', JSON.stringify(students));
+  } else {
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    delete users[currentUserForDelete];
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+  
+  alert('User deleted successfully!');
+  closeModal('deleteUserModal');
+  renderDashboard();
+}
+
+// Render user management section
+function renderUserManagement() {
+  if(!currentUser || currentUser.role !== 'principal') return;
+  
+  renderStudentsGrid();
+}
+
+// Render students grid
+function renderStudentsGrid() {
+  const students = JSON.parse(localStorage.getItem('students') || '{}');
+  const studentsGrid = el('studentsGrid');
+  studentsGrid.innerHTML = '';
+  
+  Object.keys(students).forEach(username => {
+    const student = students[username];
+    const studentCard = document.createElement('div');
+    studentCard.className = 'user-card';
+    studentCard.innerHTML = `
+      <h4>${escapeHtml(student.name)}</h4>
+      <p><strong>Class:</strong> ${escapeHtml(student.class)}</p>
+      <p><strong>Roll No:</strong> ${escapeHtml(student.roll)}</p>
+      <p><strong>Username:</strong> ${escapeHtml(username)}</p>
+      <div class="user-actions">
+        <button class="btn" onclick="openUpdateModal('${username}')">Edit</button>
+        <button class="btn alt" onclick="sendNotificationToStudent('${username}')">Notify</button>
+        <button class="btn warn" onclick="openDeleteUserModal('${username}', 'student')">Delete</button>
+      </div>
+    `;
+    studentsGrid.appendChild(studentCard);
+  });
+}
+
+// Render teachers grid
+function renderTeachersGrid() {
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const teachersGrid = el('teachersGrid');
+  teachersGrid.innerHTML = '';
+  
+  Object.keys(users).forEach(username => {
+    const user = users[username];
+    if (user.role === 'teacher') {
+      const teacherCard = document.createElement('div');
+      teacherCard.className = 'user-card';
+      teacherCard.innerHTML = `
+        <h4>${escapeHtml(user.name)}</h4>
+        <p><strong>Class:</strong> ${escapeHtml(user.class)}</p>
+        <p><strong>Username:</strong> ${escapeHtml(username)}</p>
+        <div class="user-actions">
+          <button class="btn warn" onclick="openDeleteUserModal('${username}', 'user')">Delete</button>
+        </div>
+      `;
+      teachersGrid.appendChild(teacherCard);
+    }
+  });
+}
+
+// Render principals grid
+function renderPrincipalsGrid() {
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const principalsGrid = el('principalsGrid');
+  principalsGrid.innerHTML = '';
+  
+  Object.keys(users).forEach(username => {
+    const user = users[username];
+    if (user.role === 'principal') {
+      const principalCard = document.createElement('div');
+      principalCard.className = 'user-card';
+      principalCard.innerHTML = `
+        <h4>${escapeHtml(user.name)}</h4>
+        <p><strong>Username:</strong> ${escapeHtml(username)}</p>
+        <div class="user-actions">
+          ${username !== currentUser.username ? 
+            `<button class="btn warn" onclick="openDeleteUserModal('${username}', 'user')">Delete</button>` : 
+            `<span>Current User</span>`
+          }
+        </div>
+      `;
+      principalsGrid.appendChild(principalCard);
+    }
+  });
+}
+
+// Render dashboard
+function renderDashboard(){
+  const students = JSON.parse(localStorage.getItem('students')||'{}');
+  const users = JSON.parse(localStorage.getItem('users')||'{}');
+
+  // Hide user management section by default
+  el('userManagementSection').style.display = 'none';
+
+  // Show/hide admin elements based on role
+  if (currentUser && currentUser.role === 'principal') {
+    document.body.classList.add('role-principal');
+  } else {
+    document.body.classList.remove('role-principal');
+  }
+
+  if(!currentUser){
+    el('welcomeTitle').innerText = 'Welcome!';
+    el('welcomeMsg').innerText = 'Please login to access dashboard features.';
+    el('notificationsCard').style.display = 'none';
+    el('studentsCard').style.display = 'none';
+    el('profileName').innerText = 'Guest';
+    el('profileRole').innerText = 'Not logged in';
+    el('avatarInitial').innerText = 'G';
+    el('logoutBtn').style.display = 'none';
+    el('logoutIcon').style.display = 'none';
+    el('viewProfileBtn').style.display = 'none';
+    el('classContainer').innerHTML = '';
+    el('globalHighlighted').innerHTML = '';
+    el('classTeacherLabel').style.display='none';
+    el('bulkNotifyBtn').style.display='none';
+    
+    // Clear student-specific data when logged out
+    el('feesPending').innerText = '-';
+    el('attendanceVal').innerText = '-';
+    
+    return;
+  }
+
+  el('welcomeTitle').innerText = `Hello, ${currentUser.name}`;
+  el('welcomeMsg').innerText = `Role: ${currentUser.role.toUpperCase()}${currentUser.class?(' — Class: '+currentUser.class):''}`;
+  el('profileName').innerText = currentUser.name;
+  el('profileRole').innerText = currentUser.role.toUpperCase();
+  el('avatarInitial').innerText = currentUser.name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  el('logoutBtn').style.display = 'inline-block';
+  el('logoutIcon').style.display = 'inline-block';
+  el('viewProfileBtn').style.display = (currentUser.role==='student') ? 'inline-block' : 'none';
+
+  const globalNotifs = JSON.parse(localStorage.getItem('globalNotifs')||'[]');
+  if(globalNotifs.length){
+    el('globalHighlighted').innerHTML = `<div class="highlight"><strong style="color:#92400e">School Notice:</strong> ${escapeHtml(globalNotifs[0].text)}</div>`;
+    el('notifCount').innerText = ` (total ${globalNotifs.length})`;
+  } else {
+    el('globalHighlighted').innerHTML = '';
+    el('notifCount').innerText = '';
+  }
+
+  if(currentUser.role === 'student'){
+    el('notificationsCard').style.display = 'block';
+    el('studentsCard').style.display = 'none';
+    const me = students[currentUser.username];
+    el('notifList').innerHTML = '';
+    (me.notifications || []).forEach(n => {
+      const li = document.createElement('li'); li.innerHTML = `<div>${escapeHtml(n)}</div>`; el('notifList').appendChild(li);
+    });
+    (globalNotifs||[]).slice(0,5).forEach(n => {
+      const li = document.createElement('li'); li.innerHTML = `<div style="font-weight:700;color:#b91c1c">${escapeHtml(n.text)}</div>`; el('notifList').appendChild(li);
+    });
+    el('feesPending').innerText = '₹' + ((me.feesTotal||0) - (me.feesPaid||0));
+    el('attendanceVal').innerText = me.attendance || '-';
+  } else if(currentUser.role === 'teacher'){
+    el('notificationsCard').style.display = 'none';
+    el('studentsCard').style.display = 'block';
+    el('classContainer').innerHTML = '';
+    el('classTeacherLabel').innerText = `Class teacher: ${currentUser.name}`; el('classTeacherLabel').style.display='inline-block';
+    el('bulkNotifyBtn').style.display='inline-block';
+
+    const classBlock = document.createElement('div'); classBlock.className='class-block card';
+    classBlock.innerHTML = `<h3 style="margin-top:0">Class ${escapeHtml(currentUser.class)}</h3>`;
+    const ul = document.createElement('ul'); ul.className='list';
+    Object.keys(students).forEach(k => {
+      if(students[k].class === currentUser.class){
+        const s = students[k];
+        const li = document.createElement('li');
+        li.innerHTML = `<div style="text-align:left"><strong>${escapeHtml(s.name)}</strong><br><small>Roll: ${escapeHtml(s.roll)} • ${escapeHtml(s.attendance)} • Pending: ₹${(s.feesTotal||0)-(s.feesPaid||0)}</small></div>`;
+        const controls = document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px';
+        const updBtn = document.createElement('button'); updBtn.className='btn'; updBtn.innerText='Update'; 
+        updBtn.onclick = () => openUpdateModal(k);
+        const notifyBtn = document.createElement('button'); notifyBtn.className='btn ghost'; notifyBtn.innerText='Notify'; 
+        notifyBtn.onclick = () => sendNotificationToStudent(k);
+        controls.appendChild(updBtn); controls.appendChild(notifyBtn);
+        li.appendChild(controls);
+        ul.appendChild(li);
+      }
+    });
+    classBlock.appendChild(ul);
+    el('classContainer').appendChild(classBlock);
+  } else if(currentUser.role === 'principal'){
+    el('notificationsCard').style.display = 'block';
+    el('studentsCard').style.display = 'block';
+    el('classContainer').innerHTML = '';
+    const classes = {};
+    Object.keys(students).forEach(k => {
+      const s = students[k];
+      if(!classes[s.class]) classes[s.class] = [];
+      classes[s.class].push(Object.assign({username: k}, s));
+    });
+    Object.keys(classes).sort().forEach(cls => {
+      const card = document.createElement('div'); card.className='card class-block';
+      const teacherForClass = Object.values(users).find(u=>u.role==='teacher' && u.class===cls);
+      card.innerHTML = `<h3 style="margin-top:0">Class ${escapeHtml(cls)} ${teacherForClass ? ' — Teacher: '+escapeHtml(teacherForClass.name) : ''}</h3>`;
+      const ul = document.createElement('ul'); ul.className='list';
+      classes[cls].forEach(s=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<div style="text-align:left"><strong>${escapeHtml(s.name)}</strong><br><small>Roll: ${escapeHtml(s.roll)} • Pending: ₹${(s.feesTotal||0)-(s.feesPaid||0)}</small></div>`;
+        const btns = document.createElement('div'); btns.style.display='flex'; btns.style.gap='8px';
+        const viewBtn = document.createElement('button'); viewBtn.className='btn ghost'; viewBtn.innerText='View';
+        viewBtn.onclick = () => openProfileModal(s.username);
+        const updBtn = document.createElement('button'); updBtn.className='btn'; updBtn.innerText='Update'; 
+        updBtn.onclick = () => openUpdateModal(s.username);
+        const notifyBtn = document.createElement('button'); notifyBtn.className='btn ghost'; notifyBtn.innerText='Notify'; 
+        notifyBtn.onclick = () => sendNotificationToStudent(s.username);
+        btns.appendChild(viewBtn);
+        btns.appendChild(updBtn);
+        btns.appendChild(notifyBtn);
+        li.appendChild(btns);
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      el('classContainer').appendChild(card);
+    });
+
+    el('notifList').innerHTML = '';
+    (globalNotifs||[]).forEach(n => {
+      const li = document.createElement('li'); li.innerHTML = `<div style="font-weight:700;color:#b91c1c">${escapeHtml(n.text)}</div>`;
+      el('notifList').appendChild(li);
+    });
+  }
+}
+
+// Initialize EmailJS with your Public Key (replace the existing emailjs.init line)
+emailjs.init("6CYmu4BNxGXWmbleC");
+
+// Submit admission form
+function submitAdmissionForm(e) {
+  e.preventDefault();
+  
+  // Reset all errors
+  document.querySelectorAll('.form-error').forEach(el => el.style.display = 'none');
+  el('admissionSuccess').style.display = 'none';
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+  
+  let isValid = true;
+  
+  // Validate first name
+  if (!data.first_name.trim()) {
+    showError('firstName', 'First name is required');
+    isValid = false;
+  }
+  
+  // Validate last name
+  if (!data.last_name.trim()) {
+    showError('lastName', 'Last name is required');
+    isValid = false;
+  }
+  
+  // Validate date of birth
+  if (!data.dob) {
+    showError('dob', 'Date of birth is required');
+    isValid = false;
+  } else {
+    const dob = new Date(data.dob);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    
+    if (age < 5 || age > 18) {
+      showError('dob', 'Student must be between 5 and 18 years old');
+      isValid = false;
+    }
+  }
+  
+  // Validate gender
+  if (!data.gender) {
+    showError('gender', 'Please select a gender');
+    isValid = false;
+  }
+  
+  // Validate parent name
+  if (!data.parent_name.trim()) {
+    showError('parentName', 'Parent/guardian name is required');
+    isValid = false;
+  }
+  
+  // Validate email
+  if (!data.email.trim()) {
+    showError('email', 'Email address is required');
+    isValid = false;
+  } else if (!isValidEmail(data.email)) {
+    showError('email', 'Please enter a valid email address');
+    isValid = false;
+  }
+  
+  // Validate phone
+  if (!data.phone.trim()) {
+    showError('phone', 'Phone number is required');
+    isValid = false;
+  } else if (!isValidPhoneNumber(data.phone)) {
+    showError('phone', 'Please enter a valid phone number');
+    isValid = false;
+  }
+  
+  // Validate address
+  if (!data.address.trim()) {
+    showError('address', 'Address is required');
+    isValid = false;
+  }
+  
+  // Validate class
+  if (!data.applying_class) {
+    showError('class', 'Please select a class');
+    isValid = false;
+  }
+  
+  // Validate previous school
+  if (!data.previous_school.trim()) {
+    showError('school', 'Previous school name is required');
+    isValid = false;
+  }
+  
+  if (!isValid) {
+    return;
+  }
+  
+  // Show loading state
+  const submitBtn = el('submitAdmission');
+  const originalText = submitBtn.textContent;
+  submitBtn.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+  submitBtn.disabled = true;
+  
+  // Send email using EmailJS
+  emailjs.sendForm("Student_Email", "Student_Template", form)
+    .then(() => {
+      // Show success message
+      el('admissionSuccess').style.display = 'block';
+      form.reset();
+      
+      // Also store in local storage for records
+      const admissions = JSON.parse(localStorage.getItem('admissions') || '[]');
+      admissions.push({
+        ...data,
+        submittedAt: new Date().toISOString(),
+        status: 'pending'
+      });
+      localStorage.setItem('admissions', JSON.stringify(admissions));
+      
+      // Show browser notification if permitted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Admission Submitted', {
+          body: 'Thank you for submitting the admission form. We will contact you soon.'
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Failed to send email:', error);
+      alert('There was an error submitting your form. Please try again or contact the school directly.');
+    })
+    .finally(() => {
+      // Restore button state
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+}
+
+// Initialize the application
+function init(){
+  seedData();
+  setupEventListeners();
+  checkMobileUser(); // Check if user is on mobile device
+  renderDashboard();
+  console.log('Portal initialized. Sample student usernames: aman, pawan, laxmi. Teachers: teachera, teacherb, anurag, priyanka. Principal: principal');
+}
+
+// Start the application
+init();
+</script>
+</body>
+</html>
