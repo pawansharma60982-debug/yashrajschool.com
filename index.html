@@ -6,6 +6,7 @@
   <title>Yash Raj School Portal — Admission & Notification System</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="script.js"></script>
   <style>
     :root{
       --bg1:#0b1220; --accent:#06b6d4; --primary:#4f46e5; --card:#ffffff;
@@ -337,12 +338,12 @@
         <div class="form-row">
           <div>
             <label>Student's First Name</label>
-            <input type="text" name="first_name" required />
+            <input type="text" name="first_name" required id="sn" />
             <div class="form-error" id="firstNameError"></div>
           </div>
           <div>
             <label>Student's Last Name</label>
-            <input type="text" name="last_name" required />
+            <input type="text" name="last_name" id="ls" required />
             <div class="form-error" id="lastNameError"></div>
           </div>
         </div>
@@ -350,66 +351,66 @@
         <div class="form-row">
           <div>
             <label>Date of Birth</label>
-            <input type="date" name="dob" required />
+            <input type="date" name="dob" id="dob" required />
             <div class="form-error" id="dobError"></div>
           </div>
           <div>
             <label>Gender</label>
-            <select name="gender" required>
+            <select name="gender" id="ge" required>
               <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="male" id="ge">Male</option>
+              <option value="female" id="ge">Female</option>
+              <option value="other" id="ge">Other</option>
             </select>
             <div class="form-error" id="genderError"></div>
           </div>
         </div>
 
         <label>Parent/Guardian Name</label>
-        <input type="text" name="parent_name" required />
-        <div class="form-error" id="parentNameError"></div>
+        <input type="text" name="parent_name" id="parents_name_email" required />
+        <div class="form-error" id="parentNameError pn"></div>
 
         <label>Email Address</label>
-        <input type="email" name="email" placeholder="parent@example.com" required />
-        <div class="form-error" id="emailError"></div>
+        <input type="email" name="email" placeholder="parent@example.com" id="ea" required />
+        <div class="form-error" id="emailError ea"></div>
 
         <label>Phone Number</label>
         <input type="tel" name="phone" placeholder="+91 1234567890" required />
         <div class="form-error" id="phoneError"></div>
 
         <label>Address</label>
-        <textarea name="address" rows="3" required></textarea>
+        <textarea name="address" rows="3" required id="ad"></textarea>
         <div class="form-error" id="addressError"></div>
 
         <div class="form-row">
           <div>
             <label>Class Applying For</label>
-            <select name="applying_class" required>
-              <option value="">Select Class</option>
-              <option value="6">6th Standard</option>
-              <option value="7">7th Standard</option>
-              <option value="8">8th Standard</option>
-              <option value="9">9th Standard</option>
-              <option value="10">10th Standard</option>
-              <option value="11">11th Standard</option>
-              <option value="12">12th Standard</option>
+            <select name="applying_class" id="classapply" required>
+              <option value="" id="classapply">Select Class</option>
+              <option value="6" id="classapply">6th Standard</option>
+              <option value="7" id="classapply">7th Standard</option>
+              <option value="8" id="classapply">8th Standard</option>
+              <option value="9" id="classapply">9th Standard</option>
+              <option value="10" id="classapply">10th Standard</option>
+              <option value="11" id="classapply">11th Standard</option>
+              <option value="12" id="classapply">12th Standard</option>
             </select>
             <div class="form-error" id="classError"></div>
           </div>
           <div>
             <label>Previous School</label>
-            <input type="text" name="previous_school" required />
+            <input type="text" name="previous_school" id="ps" required />
             <div class="form-error" id="schoolError"></div>
           </div>
         </div>
 
         <label>Additional Notes</label>
-        <textarea name="notes" rows="2"></textarea>
+        <textarea name="notes" rows="2" id="an"></textarea>
 
         <div class="form-success" id="admissionSuccess">Admission form submitted successfully! We'll contact you soon.</div>
         
         <div class="form-actions">
-          <button type="submit" class="btn" id="submitAdmission">Submit Application</button>
+          <button type="submit" class="btn" id="submitAdmission" onclick="SendEmail()">Submit Application</button>
           <button type="button" class="btn ghost" onclick="closeModal('admissionModal')">Cancel</button>
         </div>
       </form>
@@ -590,7 +591,7 @@ function escapeHtml(s){ if(!s && s!==0) return ''; return s.toString().replace(/
 
 // Initialize EmailJS with your Public Key
 // Replace with your actual EmailJS Public Key
-emailjs.init("YOUR_PUBLIC_KEY_HERE");
+emailjs.init("6CYmu4BNxGXWmbleC");
 
 // Check if user is on mobile device
 function isMobileDevice() {
@@ -636,11 +637,11 @@ function addDefaultUsers() {
   localStorage.setItem('students', JSON.stringify(students));
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('globalNotifs', JSON.stringify([
-    {text: 'School will remain closed on Monday for maintenance'},
+    {text: 'Wellcome to Yash Raj School Portal!'},
     {text: 'Annual function rehearsals start next week'}
   ]));
   
-  alert('Default users added successfully! You can now login with principal/admin123 to access admin features.');
+  //alert('Default users added successfully! You can now login with principal/admin123 to access admin features.');
 }
 
 // App state
@@ -898,7 +899,7 @@ function submitAdmissionForm(e) {
   submitBtn.disabled = true;
   
   // Send email using EmailJS
-  emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", data)
+  emailjs.send("Student_Email", "Student_Template", data)
     .then(() => {
       // Show success message
       el('admissionSuccess').style.display = 'block';
@@ -1788,6 +1789,7 @@ function submitAdmissionForm(e) {
     });
 }
 
+
 // Initialize the application
 function init(){
   seedData();
@@ -1795,6 +1797,25 @@ function init(){
   checkMobileUser(); // Check if user is on mobile device
   renderDashboard();
   console.log('Portal initialized. Sample student usernames: aman, pawan, laxmi. Teachers: teachera, teacherb, anurag, priyanka. Principal: principal');
+}
+
+
+//fuction to send email using emailjs
+function SendEmail(){
+     let SendEmailToStudent = {
+          first_name: document.getElementById('sn').value,
+          last_name: document.getElementById('ls').value,
+          dob: document.getElementById('dob').value,
+          gender: document.getElementById('ge').value,
+          parentsname: document.getElementById('parents_name_email').value,
+          Email: document.getElementById('ea').value,
+          phone: document.getElementById('ph').value,
+          address: document.getElementById('ad').value,
+          applying_class: document.getElementById('classapply').value,
+          previous_school: document.getElementById('ps').value,
+          notes: document.getElementById('an').value
+     };
+     emailjs.send('Student_Email','Student_Tamplate',SendEmailToStudent).then(function(Response) {alert('Thank you for submitting the form. We will contact you soon!');}), function(error) {alert('FAILED...', error);};
 }
 
 // Start the application
