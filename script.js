@@ -761,7 +761,7 @@
             return `
                 <div class="profile-header">
                     <div class="position-relative d-inline-block">
-                        <img src="${userData.photoURL || 'https://image2url.com/images/1759169830194-ed0790f0-558c-40d1-87a2-11c34ad98f88.jpg'}" 
+                        <img src="${userData.photoURL || 'https://image2url.com/images/1759170596235-d5dc83bf-b210-429f-86e1-06b61a70d42a.jpg'}" 
                              class="profile-avatar" id="principalProfileImg">
                         <button class="btn btn-sm btn-outline-secondary position-absolute bottom-0 end-0 rounded-circle" 
                                 onclick="showImageUploadModal()">
@@ -2003,3 +2003,4 @@
         // Make functions globally available
         window.showImageUploadModal = showImageUploadModal;
         window.uploadProfilePhoto = uploadProfilePhoto;
+
