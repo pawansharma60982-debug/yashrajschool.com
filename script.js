@@ -29,7 +29,7 @@
         // Toppers data
         const toppers = [
             { name: "Rahul Sharma", percentage: "92.2%", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "Priya Patel", percentage: "91.2%", image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
+            { name: "Priya Patel", percentage: "91.2%", image: "https://image2url.com/images/1759169383743-7efcb563-0254-4f08-a67d-d76cba91e902.jpeg" },
             { name: "Amit Kumar", percentage: "90.1%", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
             { name: "Gaurav", percentage: "89.7%", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
             { name: "Shlok Paswan", percentage: "87%", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
@@ -761,14 +761,14 @@
             return `
                 <div class="profile-header">
                     <div class="position-relative d-inline-block">
-                        <img src="${userData.photoURL || 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'}" 
+                        <img src="${userData.photoURL || 'https://image2url.com/images/1759169830194-ed0790f0-558c-40d1-87a2-11c34ad98f88.jpg'}" 
                              class="profile-avatar" id="principalProfileImg">
                         <button class="btn btn-sm btn-outline-secondary position-absolute bottom-0 end-0 rounded-circle" 
                                 onclick="showImageUploadModal()">
                             <i class="fas fa-camera"></i>
                         </button>
                     </div>
-                    <h3>${userData.name || 'Principal'}</h3>
+                    <h3>${userData.name || 'Mr. Fayaz Sir'}</h3>
                     <p class="text-muted">School Principal</p>
                     <button class="btn btn-outline-primary btn-sm mt-2" onclick="showChangePasswordModal()">
                         <i class="fas fa-key me-1"></i>Change Password
